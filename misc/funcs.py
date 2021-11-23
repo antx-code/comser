@@ -14,6 +14,10 @@ import time
 from datetime import datetime
 import datetime as dt
 from collections import Counter
+import csv
+import pandas as pd
+from openpyxl import load_workbook
+from openpyxl.styles import Alignment
 from misc.ua_pools import ua
 
 # 合并两个不同的字典
@@ -283,6 +287,58 @@ def generate_years(start_year: int, end_year=None):
     for i in range(year_range + 1):
         years.append(start_year + i)
     return years
+
+# 将内容保存为csv文件
+@logger.catch(level='ERROR')
+def save2csv(filename: str, fileds: list, content: dict):
+    """
+
+    Save the content into cvs file.
+
+    """
+    base_path = os.getcwd()
+    target_file_path = f'{base_path}/{filename}.csv'
+    with open(target_file_path, 'a+', encoding='utf-8') as f:
+        fieldnames = fileds
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        if os.path.getsize(target_file_path) == 0:
+            writer.writeheader()
+        writer.writerow(content)
+        f.close()
+
+# 将目标csv文件转换成xlsx文件
+@logger.catch(level='ERROR')
+def csv2xlsx(csv_filename: str):
+    """
+
+    Transfer the csv file into xlsx file.
+
+    """
+    base_path = os.getcwd()
+    csvf = pd.read_csv(f'{base_path}/{csv_filename}.csv')
+    csvf.to_excel(f'{base_path}/{csv_filename}.xlsx', sheet_name='data')
+
+# 对xlsx文件做简单的格式化处理
+@logger.catch(level='ERROR')
+def proc_xlsx(xlsx_filename: str, lines: int):
+    """
+
+    Do some tips to optimize xlsx file.
+
+    :param xlsx_file_name: The xlsx file absolute path and name.
+    :return:
+    """
+    base_path = os.getcwd()
+    xlsx_file = f'{base_path}/{xlsx_filename}.xlsx'
+    wb = load_workbook(xlsx_file)
+    ws = wb[wb.sheetnames[0]]
+    column_list = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+                   'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA']
+    for col in column_list:
+        ws.column_dimensions[col].width = 25
+        for i in range(1, lines + 2):
+            ws[col + str(i)].alignment = Alignment(horizontal='center', vertical='center')
+    wb.save(xlsx_file)
 
 # 从字符串中提取url
 @logger.catch(level='ERROR')
