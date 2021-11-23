@@ -1,0 +1,18 @@
+MONGO:
+  ADDRESS: '127.0.0.1'
+  USERNAME: 'your-username'
+  PASSWORD: 'your-passwd'
+  PORT: 27017
+
+REDIS:
+  HOST: '127.0.0.1'
+  PORT: 6379
+  PASSWORD: 'your-passwd'
+
+AUTH:
+  IDENTITY:
+    - dev
+    - prod
+    - antx
+    - your-identity
+  SALT: 'your-salt'
