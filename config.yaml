@@ -9,6 +9,14 @@ REDIS:
   PORT: 6379
   PASSWORD: 'your-passwd'
 
+EMAIL:
+  SENDER: 'sender-email'
+  SENDER_PWD: 'sender_pwd'
+  HOST_SERVER: 'smtp.163.com'
+  RECEIVER:
+    - 'receiver-email1'
+    - 'receiver-email2'
+
 AUTH:
   IDENTITY:
     - dev

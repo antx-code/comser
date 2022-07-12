@@ -61,6 +61,7 @@ uvloop = "0.16.0"
 werkzeug = "2.0.2"
 wrapt = "1.13.3"
 numpy = "^1.23.1"
+yagmail = "^0.15.280"
 
 [tool.poetry.dev-dependencies]
 

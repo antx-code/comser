@@ -19,6 +19,10 @@ import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from misc.ua_pools import ua
+import yagmail
+from __init__ import config
+
+EMAIL_CONF = config['EMAIL']
 
 # 合并两个不同的字典
 @logger.catch(level='ERROR')
@@ -246,14 +250,37 @@ def select_from_list(elements: list, targets: list):
 
 # 将时间转换为时间戳
 @logger.catch(level='ERROR')
-def time2timestamp(tar_time: str, time_format: str):
+def time2timestamp(tar_time: str, time_format: str = '%Y-%m-%d %H:%M:%S'):
     time_array = time.strptime(tar_time, time_format)
     timestamp = time.mktime(time_array)
     return int(timestamp)
 
+# 将时间戳转换为时间
+@logger.catch(level='ERROR')
+def timestamp2time(timestamp: int, time_format: str = '%Y-%m-%d %H:%M:%S'):
+    t = time.localtime(int(timestamp / 1000))
+    format_time = time.strftime(time_format, t)
+    return format_time
+
+# 输入时间周期转换为相应秒数，如: 10m(输入) -> 600(输出)
+@logger.catch(level='ERROR')
+def period2second(period: str):
+    if 's' in period:
+        second = int(period.split('s')[0])
+    elif 'm' in period:
+        second = 60 * int(period.split('m')[0])
+    elif 'h' in period:
+        second = 3600 * int(period.split('h')[0])
+    elif 'd' in period:
+        second = 86400 * int(period.split('d')[0])
+    else:                                                       # 默认60s
+        second = 60
+    logger.info(f'period2second: {second} s')
+    return second
+
 # 获取任一日期(datetime.datetime类型)之前n个月的倒序月份
 @logger.catch(level='ERROR')
-def generate__n_month(date, n):
+def generate_n_month(date, n):
     """
 
     Get the special month list that you want to.
@@ -395,3 +422,13 @@ def GeocoderOSMN(lon:float, lat:float):
         result = geocoder.osm([lat, lon], method='reverse', key=MapQuestKey).json
     final_result = {'lat': result['raw']['lat'], 'lon': result['raw']['lon'], 'display_name': result['raw']['display_name'], 'address': result['raw']['address'], 'boundingbox': result['raw']['boundingbox']}
     return final_result
+
+# 发送邮件
+@logger.catch(level='ERROR')
+def email(title, content):
+    sender_email = EMAIL_CONF['SENDER']
+    sender_pwd = EMAIL_CONF['SENDER_PWD']
+    host_server = EMAIL_CONF['HOST_SERVER']
+    receiver = EMAIL_CONF['RECEIVER']
+    yag = yagmail.SMTP(user=sender_email, password=sender_pwd, host=host_server)
+    yag.send(to=receiver, subject=title, contents=content)
