@@ -1,12 +1,9 @@
 from pymongo import MongoClient
 from loguru import logger
-from __init__ import config
-
-CONF = config['MONGO']
 
 class MongoDB():
     @logger.catch(level='ERROR')
-    def __init__(self, db, col, port=27017):
+    def __init__(self, address='127.0.0.1', username='', password='', db='', col='', port=27017):
         """
 
         initial the mongodb and select the database and collection.
@@ -14,7 +11,9 @@ class MongoDB():
         :param db: The database that you want to operate.
         :param col: The collection that you want to opreate.
         """
-        client = MongoClient(f'mongodb://{CONF["USERNAME"]}:{CONF["PASSWORD"]}@{CONF["ADDRESS"]}:{port}', connect=False)
+        if not db or not col:
+            raise ValueError('Please provide correct db or col!')
+        client = MongoClient(f'mongodb://{username}:{password}@{address}:{port}', connect=False)
         try:
             self.database = client[db]
         except Exception as e:

@@ -18,11 +18,7 @@ import csv
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
-from misc.ua_pools import ua
-import yagmail
-from __init__ import config
-
-EMAIL_CONF = config['EMAIL']
+from funcs.ua_pools import ua
 
 # 合并两个不同的字典
 @logger.catch(level='ERROR')
@@ -422,13 +418,3 @@ def GeocoderOSMN(lon:float, lat:float):
         result = geocoder.osm([lat, lon], method='reverse', key=MapQuestKey).json
     final_result = {'lat': result['raw']['lat'], 'lon': result['raw']['lon'], 'display_name': result['raw']['display_name'], 'address': result['raw']['address'], 'boundingbox': result['raw']['boundingbox']}
     return final_result
-
-# 发送邮件
-@logger.catch(level='ERROR')
-def email(title, content):
-    sender_email = EMAIL_CONF['SENDER']
-    sender_pwd = EMAIL_CONF['SENDER_PWD']
-    host_server = EMAIL_CONF['HOST_SERVER']
-    receiver = EMAIL_CONF['RECEIVER']
-    yag = yagmail.SMTP(user=sender_email, password=sender_pwd, host=host_server)
-    yag.send(to=receiver, subject=title, contents=content)

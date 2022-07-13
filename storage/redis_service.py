@@ -1,13 +1,10 @@
 from redis import Redis
 from loguru import logger
 import json
-from __init__ import config
-
-CONF = config['REDIS']
 
 class RedisService():
     @logger.catch(level='ERROR')
-    def __init__(self, port=CONF['PORT'], redis_db=0):
+    def __init__(self, address='127.0.0.1', password='', port=6379, db=0):
         """
 
         The init of the redis service.
@@ -17,7 +14,7 @@ class RedisService():
         :param redis_db: The redis database that you want to operate in the future, and it's defualt value is 0. You can
         chose a value in the scope of 0-15.
         """
-        self.redis_client = Redis(host=CONF['HOST'], password=CONF['PASSWORD'], port=port, db=redis_db)
+        self.redis_client = Redis(host=address, password=password, port=port, db=db)
 
     @logger.catch(level='ERROR')
     def new_insert_content(self, redis_key, new_content):

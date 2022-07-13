@@ -1,20 +1,22 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from loguru import logger
-from __init__ import config
-
-CONF = config['MONGO']
 
 class AsyncMongo():
     @logger.catch(level='ERROR')
-    def __init__(self, db, col, port):
+    def __init__(self, address='127.0.0.1', username='', password='', db='', col='', port=27017):
         """
 
         Init the mongodb with asyncio method.
 
+        :param address: The address to connect, the default is 127.0.0.1 .
+        :param username: The username to connect.
+        :param password: The password to connect.
         :param db: The mongodb name.
         :param col: The collection of the mongodb.
         """
-        client = AsyncIOMotorClient(f'mongodb://{CONF["USERNAME"]}:{CONF["PASSWORD"]}@{CONF["ADDRESS"]}:{port}')
+        if not db or not col:
+            raise ValueError('Please provide correct db or col!')
+        client = AsyncIOMotorClient(f'mongodb://{username}:{password}@{address}:{port}')
         database = client[db]
         self.collection = database[col]
 
