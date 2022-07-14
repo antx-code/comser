@@ -9,11 +9,11 @@ class Mail():
         self.sender_password = ''
 
     @logger.catch(level='ERROR')
-    def set_config(self, sender: str, receiver: list, password: str, host_server: str = 'smtp.163.com'):
-        if not sender or not receiver or not password:
+    def set_config(self, sender: str, receivers: list, password: str, host_server: str = 'smtp.163.com'):
+        if not sender or not receivers or not password:
             raise ValueError('Please provide correct config for email!')
         self.sender = sender
-        self.receiver = receiver
+        self.receiver = receivers
         self.sender_password = password
         self.host_server = host_server
 
