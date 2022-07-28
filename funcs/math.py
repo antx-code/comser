@@ -1,17 +1,17 @@
 class MathSa():
-    def __init__(self, target: list):
-        self.target = target
+    def __init__(self):
+        pass
 
     # 最大值
-    def get_max(self, data):
+    def get_max(self, data: list):
         return max(data)
 
     # 最小值
-    def get_min(self, data):
+    def get_min(self, data: list):
         return min(data)
 
     # 极差
-    def get_range(self, data):
+    def get_range(self, data: list):
         return max(data) - min(data)
 
     # 中位数
@@ -55,15 +55,15 @@ class MathSa():
             sum += item ** n
         return round(sum / len(data), save_point)
 
-    def math_aggregation(self, save_point=2):
+    def math_aggregation(self, data: list, save_point=2):
         math_sa = {
-            'max': self.get_max(self.target),
-            'min': self.get_min(self.target),
-            'range': self.get_range(self.target),
-            'median': self.get_median(self.target, save_point),
-            'most': self.get_most(self.target, save_point),
-            'average': self.get_average(self.target, save_point),
-            'variance': self.get_variance(self.target, save_point),
-            'nmoment': self.get_nmoment(self.target, 2, save_point)
+            'max': self.get_max(data),
+            'min': self.get_min(data),
+            'range': self.get_range(data),
+            'median': self.get_median(data, save_point),
+            'most': self.get_most(data, save_point),
+            'average': self.get_average(data, save_point),
+            'variance': self.get_variance(data, save_point),
+            'nmoment': self.get_nmoment(data, 2, save_point)
         }
         return math_sa
