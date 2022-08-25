@@ -18,49 +18,49 @@ class RedisService():
         self.redis_client = Redis(host=address, password=password, port=port, db=db)
 
     @logger.catch(level='ERROR')
-    def new_insert_content(self, redis_key, new_content):
+    def add2set(self, key_name, content):
         """
 
         将数据插入redis，如果数据不存在，返回1,如果数据已经存在，则不插入并返回0
 
-        :param redis_key: The redis key that you want to operate.
-        :param new_cobntent: The data that you want to insert and judge. Must be same as the exists data.
+        :param key_name: The redis key that you want to operate.
+        :param content: The data that you want to insert and judge. Must be same as the exists data.
         :return: A bool value of the operate.
         """
-        if self.redis_client.sadd(redis_key, new_content) == 1:
+        if self.redis_client.sadd(key_name, content) == 1:
             return True
         return False
 
     @logger.catch(level='ERROR')
-    def read_redis(self, redis_key):
+    def get_set(self, key_name):
         """
 
         Read the redis keys' data.
 
-        :param redis_key: The redis key that you want to query.
+        :param key_name: The redis key that you want to query.
         :return: A list of the query data.
         """
         data_list = []
-        data_set = self.redis_client.smembers(redis_key)
+        data_set = self.redis_client.smembers(key_name)
         for each_data in data_set:
             data_list.append(each_data.decode())
         return data_list
 
     @logger.catch(level='ERROR')
-    def del_redis_element(self, tar_redis_key, tar_element):
+    def remove_set_element(self, key_name, element):
         """
 
         Delete a redis element data of the redis key.
 
-        :param tar_redis_key: The redis key that you want to delete the element data.
-        :param tar_element: The data that you want to delete.
+        :param key_name: The redis key that you want to delete the element data.
+        :param element: The data that you want to delete.
         :return: A bool value of the operate.
         """
-        self.redis_client.srem(tar_redis_key, tar_element)
+        self.redis_client.srem(key_name, element)
         return True
 
     @logger.catch(level='ERROR')
-    def set_expire_key(self, key_name, key_vaule, expire_secs=None):
+    def set_exp_key(self, key_name, key_vaule, expire_secs=None):
         """
 
         Set a expire key, include it's name、value and expire time.
@@ -75,7 +75,7 @@ class RedisService():
         return True
 
     @logger.catch(level='ERROR')
-    def get_key_expire_content(self, key_name):
+    def get_exp_key(self, key_name):
         """
 
         Get the expire redis key's content.
@@ -87,49 +87,22 @@ class RedisService():
         return result.decode()
 
     @logger.catch(level='ERROR')
-    def get_diff_set(self, tar_redis_key, small_redis_key, big_redis_key):
+    def diff_set(self, new_key_name, small_key_name, big_key_name):
         """
 
         Get two redis keys' content difference set.
 
-        :param tar_redis_key: New redis key that save the difference set data.
-        :param small_redis_key: The redis key that own a relative small content set.
-        :param big_redis_key: The redis key that own a relative big content set.
+        :param new_key_name: New redis key that save the difference set data.
+        :param small_key_name: The redis key that own a relative small content set.
+        :param big_key_name: The redis key that own a relative big content set.
         :return: A bool value of the operate.
         """
-        self.redis_client.sdiffstore(tar_redis_key, big_redis_key, small_redis_key)
+        self.redis_client.sdiffstore(new_key_name, big_key_name, small_key_name)
         return True
 
     @logger.catch(level='ERROR')
-    def set_dep_key(self, key_name, key_value, expire_secs=None):
-        """
-
-        Set a duplicate redis key, which include content and expire time.
-
-        :param key_name: The duplicate redis key that you want to be saved.
-        :param key_value: The duplicate content of the redis key
-        :param expire_secs: The expire time of the redis key and value. It's default value is None
-        :return: A bool value of the operate.
-        """
-        self.redis_client.set(key_name, key_value, ex=expire_secs)
-        return True
-
-    @logger.catch(level='ERROR')
-    def rename_redis_key(self, old_redis_key, new_redis_key):
-        self.redis_client.rename(old_redis_key, new_redis_key)
-        return True
-
-    @logger.catch(level='ERROR')
-    def save_dict_data(self, redis_key, tar_data: dict):
-        """
-
-        Save the dict data into redis.
-
-        :param redis_key: The key of the dict data.
-        :param tar_data: The target data, and it must be a dict value.
-        :return: The result of the operate.
-        """
-        self.redis_client.hmset(redis_key, tar_data)
+    def rename_redis_key(self, old_key_name, new_key_name):
+        self.redis_client.rename(old_key_name, new_key_name)
         return True
 
     @logger.catch(level='ERROR')
@@ -141,7 +114,7 @@ class RedisService():
         return keys
 
     @logger.catch(level='ERROR')
-    def drop_redis_db(self):
+    def drop_db(self):
         """
 
         Drop and clear all keys in current activate redis storage.
@@ -152,80 +125,80 @@ class RedisService():
         return True
 
     @logger.catch(level='ERROR')
-    def del_redis_key(self, redis_key):
+    def del_key(self, key_name):
         """
 
         Delete a redis key in the select storage.
 
-        :param redis_key:
+        :param key_name:
         :return:
         """
-        self.redis_client.delete(redis_key)
+        self.redis_client.delete(key_name)
         return True
 
     @logger.catch(level='ERROR')
-    def sscan_redis(self, redis_key, match=None, count=1):
+    def s_scan(self, key_name, match=None, count=1):
         """
 
         Use SSCAN method to get redis data, which can set query data's count.
 
-        :param redis_key: The target key that you want to query.
+        :param key_name: The target key that you want to query.
         :param match: The parameter that you want to match.
         :param count: The amount of data that you want to return.
         :return:
         """
         result_list = []
-        result = self.redis_client.sscan(name=redis_key,match=match,count=count)[1]
+        result = self.redis_client.sscan(name=key_name, match=match, count=count)[1]
         for each_result in result:
             result_list.append(each_result.decode())
         return result_list
 
     @logger.catch(level='ERROR')
-    def hset_redis(self, redis_key, content_key, content_value):
+    def add2hashmap(self, key_name, content_key, content_value):
         """
 
         Insert hash data into redis, which have key and value like python's dic.
 
-        :param redis_key: The redis key that you want to set.
+        :param key_name: The redis key that you want to set.
         :param content_key: The key of the hash data.
         :param content_value: The value of the hash data.
         :return: The result of the operate.
         """
-        result = self.redis_client.hset(name=redis_key, key=content_key, value=content_value)
+        result = self.redis_client.hset(name=key_name, key=content_key, value=content_value)
         if result:
             return True
         return False
 
     @logger.catch(level='ERROR')
-    def hget_redis(self, redis_key, content_key):
+    def get_hashmap(self, key_name, content_key):
         """
 
         The get method of the hash data in redis.
 
-        :param redis_key: The redis key that you want to get.
+        :param key_name: The redis key that you want to get.
         :param content_key: The key of the hash data.
         :return: A origin data type of the hash data value.
         """
-        result = self.redis_client.hget(name=redis_key, key=content_key).decode()
+        result = self.redis_client.hget(name=key_name, key=content_key).decode()
         result = json.loads(result)
         return result
 
     @logger.catch(level='ERROR')
-    def get_key(self, redis_key):
-        result = self.redis_client.get(redis_key)
+    def get_key(self, key_name):
+        result = self.redis_client.get(key_name)
         if not result:
             return ''
         return result.decode('utf-8')
 
     @logger.catch(level='ERROR')
-    def incr(self, redis_key, amount=1):
-        result = self.redis_client.incr(redis_key, amount)
+    def incr(self, key_name, amount=1):
+        result = self.redis_client.incr(key_name, amount)
         return result
 
     @logger.catch(level='ERROR')
-    def incr_exp(self, redis_key, amount=1, exp=60):
-        self.redis_client.incr(redis_key, amount)
-        result_exp = self.redis_client.expire(redis_key, exp)
+    def incr_exp(self, key_name, amount=1, exp=60):
+        self.redis_client.incr(key_name, amount)
+        result_exp = self.redis_client.expire(key_name, exp)
         return result_exp
 
     @logger.catch(level='ERROR')
