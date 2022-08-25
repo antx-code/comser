@@ -227,3 +227,17 @@ class RedisService():
         self.redis_client.incr(redis_key, amount)
         result_exp = self.redis_client.expire(redis_key, exp)
         return result_exp
+
+    @logger.catch(level='ERROR')
+    def add2list(self, key_name, params):
+        if isinstance(params) is not list:
+            params = [params]
+        for param in params:
+            self.redis_client.lpush(key_name, param)
+        return True
+
+    @logger.catch(level='ERROR')
+    def get_list(self, key_name, start: int = 1, end: int = -1):
+        params = self.redis_client.lrange(key_name, start=start, end=end)
+        list_len = self.redis_client.llen(key_name)
+        return params, list_len
