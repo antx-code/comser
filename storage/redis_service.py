@@ -2,6 +2,7 @@ from redis import Redis
 from loguru import logger
 import json
 
+
 class RedisService():
     @logger.catch(level='ERROR')
     def __init__(self, address='127.0.0.1', password='', port=6379, db=0):
@@ -30,7 +31,6 @@ class RedisService():
             return True
         return False
 
-
     @logger.catch(level='ERROR')
     def read_redis(self, redis_key):
         """
@@ -46,7 +46,6 @@ class RedisService():
             data_list.append(each_data.decode())
         return data_list
 
-
     @logger.catch(level='ERROR')
     def del_redis_element(self, tar_redis_key, tar_element):
         """
@@ -59,7 +58,6 @@ class RedisService():
         """
         self.redis_client.srem(tar_redis_key, tar_element)
         return True
-
 
     @logger.catch(level='ERROR')
     def set_expire_key(self, key_name, key_vaule, expire_secs=None):
@@ -76,7 +74,6 @@ class RedisService():
         self.redis_client.set(key_name, key_vaule, ex=expire_secs)
         return True
 
-
     @logger.catch(level='ERROR')
     def get_key_expire_content(self, key_name):
         """
@@ -88,7 +85,6 @@ class RedisService():
         """
         result = self.redis_client.get(key_name)
         return result.decode()
-
 
     @logger.catch(level='ERROR')
     def get_diff_set(self, tar_redis_key, small_redis_key, big_redis_key):
@@ -103,7 +99,6 @@ class RedisService():
         """
         self.redis_client.sdiffstore(tar_redis_key, big_redis_key, small_redis_key)
         return True
-
 
     @logger.catch(level='ERROR')
     def set_dep_key(self, key_name, key_value, expire_secs=None):
@@ -168,7 +163,7 @@ class RedisService():
         self.redis_client.delete(redis_key)
         return True
 
-    @logger.catch('ERROR')
+    @logger.catch(level='ERROR')
     def sscan_redis(self, redis_key, match=None, count=1):
         """
 
@@ -185,7 +180,7 @@ class RedisService():
             result_list.append(each_result.decode())
         return result_list
 
-    @logger.catch('ERROR')
+    @logger.catch(level='ERROR')
     def hset_redis(self, redis_key, content_key, content_value):
         """
 
@@ -201,7 +196,7 @@ class RedisService():
             return True
         return False
 
-    @logger.catch('ERROR')
+    @logger.catch(level='ERROR')
     def hget_redis(self, redis_key, content_key):
         """
 
@@ -211,6 +206,24 @@ class RedisService():
         :param content_key: The key of the hash data.
         :return: A origin data type of the hash data value.
         """
-        resp = self.redis_client.hget(name=redis_key, key=content_key).decode()
-        result = json.loads(resp)
+        result = self.redis_client.hget(name=redis_key, key=content_key).decode()
+        result = json.loads(result)
         return result
+
+    @logger.catch(level='ERROR')
+    def get_key(self, redis_key):
+        result = self.redis_client.get(redis_key)
+        if not result:
+            return ''
+        return result.decode('utf-8')
+
+    @logger.catch(level='ERROR')
+    def incr(self, redis_key, amount=1):
+        result = self.redis_client.incr(redis_key, amount)
+        return result
+
+    @logger.catch(level='ERROR')
+    def incr_exp(self, redis_key, amount=1, exp=60):
+        self.redis_client.incr(redis_key, amount)
+        result_exp = self.redis_client.expire(redis_key, exp)
+        return result_exp
