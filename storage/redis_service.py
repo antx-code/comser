@@ -211,6 +211,9 @@ class RedisService():
 
     @logger.catch(level='ERROR')
     def get_list(self, key_name, start: int = 1, end: int = -1):
-        params = self.redis_client.lrange(key_name, start=start, end=end)
+        params = []
+        results = self.redis_client.lrange(key_name, start=start, end=end)
+        for result in results:
+            params.append(result.decode('utf-8'))
         list_len = self.redis_client.llen(key_name)
         return params, list_len
