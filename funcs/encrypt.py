@@ -17,21 +17,21 @@ class Encrypt():
         }
 
     @logger.catch(level='ERROR')
-    def str2b64(self, target, display=True):
-        result = base64.b64encode(target.encode('utf-8')).decode('utf-8')
+    def str2b64(self, target, display=True, encoding='utf-8'):
+        result = base64.b64encode(target.encode(encoding)).decode(encoding)
         if display:
             logger.info(f'{target} base64 encode: {result}')
         return result
 
     @logger.catch(level='ERROR')
-    def b642str(self, target, display=True):
-        result = base64.b64decode(target).decode('utf-8')
+    def b642str(self, target, display=True, encoding='utf-8'):
+        result = base64.b64decode(target).decode(encoding)
         if display:
             logger.info(f'{target} base64 decode: {result}')
         return result
 
-    def cmp_b64(self, b64, target):
-        if b64 == self.str2b64(target, False):
+    def cmp_b64(self, b64, target, encoding='utf-8'):
+        if b64 == self.str2b64(target, False, encoding):
             logger.success(f'{target} base64 encode is equal to {b64}')
             return True
         else:
