@@ -17,7 +17,7 @@ from collections import Counter
 import csv
 import pandas as pd
 from openpyxl import load_workbook
-from openpyxl.styles import Alignment
+from openpyxl.styles import Alignment, Border, Side, Font, PatternFill
 from funcs.ua_pools import ua
 
 # 合并两个不同的字典
@@ -334,12 +334,12 @@ def save2csv(filename: str, fileds: list, content: dict):
 def csv2xlsx(csv_filename: str):
     """
 
-    Transfer the csv file into xlsx file.
+    Transfer the csv file into xlsx file, in the xlsx default no index.
 
     """
     base_path = os.getcwd()
     csvf = pd.read_csv(f'{base_path}/{csv_filename}.csv')
-    csvf.to_excel(f'{base_path}/{csv_filename}.xlsx', sheet_name='data')
+    csvf.to_excel(f'{base_path}/{csv_filename}.xlsx', sheet_name='data', index=False)
 
 # 对xlsx文件做简单的格式化处理
 @logger.catch(level='ERROR')
@@ -351,8 +351,8 @@ def proc_xlsx(xlsx_filename: str, lines: int):
     :param xlsx_file_name: The xlsx file absolute path and name.
     :return:
     """
-    base_path = os.getcwd()
-    xlsx_file = f'{base_path}/{xlsx_filename}.xlsx'
+    base_path = os.path.dirname(__file__)
+    xlsx_file = f'{xlsx_filename}.xlsx'
     wb = load_workbook(xlsx_file)
     ws = wb[wb.sheetnames[0]]
     column_list = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
@@ -361,6 +361,13 @@ def proc_xlsx(xlsx_filename: str, lines: int):
         ws.column_dimensions[col].width = 25
         for i in range(1, lines + 2):
             ws[col + str(i)].alignment = Alignment(horizontal='center', vertical='center')
+            # 设置单元格边框
+            ws[col + str(i)].border = Border(
+                left=Side(border_style='thin', color='FF000000'),
+                right=Side(border_style='thin', color='FF000000'),
+                top=Side(border_style='thin', color='FF000000'),
+                bottom=Side(border_style='thin', color='FF000000'),
+            )
     wb.save(xlsx_file)
 
 # 从字符串中提取url
